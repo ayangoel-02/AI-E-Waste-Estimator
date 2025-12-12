@@ -1,0 +1,11 @@
+device_model,device_type,brand,launch_year,age_years,weight_g,battery_type,condition,is_refurbished,has_metal_chassis,screen_size_in,copper_g,gold_mg,plastic_g,lithium_g,recycling_difficulty,environmental_risk
+iPhone 12,smartphone,Apple,2020,3,164,li-ion,working,False,False,6.1,12.5,45,30.0,2.8,35,42
+Galaxy S9,smartphone,Samsung,2018,5,189,li-ion,non-working,False,False,5.8,15.0,48,36.0,3.0,40,48
+Dell Latitude 3520,laptop,Dell,2021,2,1500,li-ion,working,False,True,15.6,320.0,200,400.0,40.0,60,55
+HP Pavilion 14,laptop,HP,2017,6,1300,li-ion,damaged,False,False,14.0,280.0,180,360.0,35.0,65,70
+MacBook Air M1,laptop,Apple,2020,3,1200,li-poly,working,True,True,13.3,250.0,250,250.0,30.0,50,40
+Lenovo Charger,charger,Lenovo,2019,4,90,none,working,False,False,0,2.0,0.2,30.0,0.0,10,5
+IKEA Smart Bulb,other,Philips,2019,4,120,none,working,False,False,0,1.0,0.05,20.0,0.0,15,10
+Samsung Battery Pack,battery_pack,Samsung,2022,1,500,li-ion,working,False,False,0,8.0,0.5,100.0,120.0,55,80
+CRT Monitor 2005,desktop,Generic,2005,20,8000,none,non-working,False,True,17.0,1200.0,8000,2000.0,0.0,95,95
+Broken PCB Board,other,Generic,2015,10,200,none,damaged,False,False,0,50.0,500,20.0,0.0,80,85

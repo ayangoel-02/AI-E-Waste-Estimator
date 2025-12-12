@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI-Powered E-Waste Material Recovery Estimator</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Rajdhani', 'Segoe UI', sans-serif;
+      background: #0a0e27;
+      background-image:
+        radial-gradient(circle at 20% 30%, rgba(0, 255, 255, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(138, 43, 226, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 40% 50%, rgba(0, 191, 255, 0.05) 0%, transparent 50%),
+        linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0f1419 100%);
+      min-height: 100vh;
+      padding: 20px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Static grid background - no animation to prevent lag */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image:
+        linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 50px 50px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: rgba(15, 20, 35, 0.95);
+      border: 1px solid rgba(0, 255, 255, 0.2);
+      border-radius: 20px;
+      box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.5),
+        0 0 40px rgba(0, 255, 255, 0.1);
+      overflow: hidden;
+      position: relative;
+      z-index: 1;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #1a1f3a 0%, #2d1b4e 50%, #1a1f3a 100%);
+      color: #00ffff;
+      padding: 50px 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 2px solid rgba(0, 255, 255, 0.3);
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, rgba(0, 255, 255, 0.05) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .header h1 {
+      font-family: 'Orbitron', monospace;
+      font-size: 2.8em;
+      font-weight: 900;
+      margin-bottom: 15px;
+      position: relative;
+      z-index: 1;
+      text-shadow:
+        0 0 10px rgba(0, 255, 255, 0.5),
+        0 0 20px rgba(0, 255, 255, 0.3),
+        0 0 30px rgba(138, 43, 226, 0.3);
+      letter-spacing: 2px;
+      background: linear-gradient(135deg, #00ffff 0%, #8a2be2 50%, #00bfff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header p {
+      color: #b0e0e6;
+      font-size: 1.2em;
+      position: relative;
+      z-index: 1;
+      text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+      letter-spacing: 1px;
+    }
+
+    .content {
+      padding: 40px;
+      background: rgba(10, 14, 39, 0.3);
+    }
+
+    .form-group {
+      margin-bottom: 25px;
+      animation: fadeInUp 0.6s ease-out backwards;
+    }
+
+    .form-group:nth-child(1) {
+      animation-delay: 0.1s;
+    }
+
+    .form-group:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .form-group:nth-child(3) {
+      animation-delay: 0.3s;
+    }
+
+    .form-group:nth-child(4) {
+      animation-delay: 0.4s;
+    }
+
+    .form-group:nth-child(5) {
+      animation-delay: 0.5s;
+    }
+
+    .form-group:nth-child(6) {
+      animation-delay: 0.6s;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #00ffff;
+      font-size: 1.1em;
+      text-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
+      letter-spacing: 0.5px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid rgba(0, 255, 255, 0.3);
+      border-radius: 8px;
+      font-size: 1em;
+      transition: all 0.3s;
+      background: rgba(15, 20, 35, 0.8);
+      color: #e0e0e0;
+      font-family: 'Rajdhani', sans-serif;
+    }
+
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: #00ffff;
+      box-shadow:
+        0 0 0 3px rgba(0, 255, 255, 0.2),
+        0 0 15px rgba(0, 255, 255, 0.3);
+      transform: translateY(-2px);
+      background: rgba(15, 20, 35, 1);
+    }
+
+    input:hover,
+    select:hover {
+      border-color: rgba(0, 255, 255, 0.6);
+      box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+    }
+
+    input::placeholder {
+      color: rgba(176, 224, 230, 0.5);
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 8px;
+      transition: background 0.3s;
+    }
+
+    .checkbox-group:hover {
+      background: rgba(0, 255, 255, 0.05);
+    }
+
+    input[type="checkbox"] {
+      width: 22px;
+      height: 22px;
+      cursor: pointer;
+      accent-color: #00ffff;
+    }
+
+    .checkbox-group label {
+      color: #b0e0e6;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #00ffff 0%, #8a2be2 50%, #00bfff 100%);
+      color: #0a0e27;
+      padding: 18px 40px;
+      border: 2px solid #00ffff;
+      border-radius: 10px;
+      font-size: 1.3em;
+      font-weight: 700;
+      font-family: 'Orbitron', monospace;
+      cursor: pointer;
+      width: 100%;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+      box-shadow:
+        0 4px 15px rgba(0, 255, 255, 0.4),
+        0 0 30px rgba(138, 43, 226, 0.3);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    .btn:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow:
+        0 8px 25px rgba(0, 255, 255, 0.6),
+        0 0 40px rgba(138, 43, 226, 0.5);
+      border-color: #00ffff;
+    }
+
+    .btn:active {
+      transform: translateY(-1px);
+    }
+
+    .btn span {
+      position: relative;
+      z-index: 1;
+    }
+
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(10, 14, 39, 0.95);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      flex-direction: column;
+    }
+
+    .loading-overlay.show {
+      display: flex;
+    }
+
+    .spinner-container {
+      text-align: center;
+    }
+
+    .spinner {
+      border: 5px solid rgba(0, 255, 255, 0.2);
+      border-top: 5px solid #00ffff;
+      border-right: 5px solid #8a2be2;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .loading-text {
+      color: #00ffff;
+      font-size: 1.3em;
+      font-weight: 600;
+      font-family: 'Orbitron', monospace;
+      animation: pulse 1.5s ease-in-out infinite;
+      text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+      letter-spacing: 2px;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 0.7;
+      }
+
+      50% {
+        opacity: 1;
+      }
+    }
+
+    .error {
+      background: rgba(139, 0, 0, 0.3);
+      color: #ff6b6b;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+      display: none;
+      border: 2px solid #ff6b6b;
+      animation: shake 0.5s;
+      box-shadow: 0 0 15px rgba(255, 107, 107, 0.3);
+    }
+
+    @keyframes shake {
+
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+
+      25% {
+        transform: translateX(-10px);
+      }
+
+      75% {
+        transform: translateX(10px);
+      }
+    }
+
+    .error.show {
+      display: block;
+    }
+
+    .device-icon {
+      font-size: 1.2em;
+      margin-right: 8px;
+      filter: drop-shadow(0 0 5px rgba(0, 255, 255, 0.5));
+    }
+
+    small {
+      color: rgba(176, 224, 230, 0.7);
+      font-size: 0.9em;
+      display: block;
+      margin-top: 5px;
+    }
+
+    .info-badge {
+      display: inline-block;
+      background: rgba(0, 255, 255, 0.1);
+      color: #00ffff;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 0.85em;
+      margin-top: 5px;
+      border: 1px solid rgba(0, 255, 255, 0.3);
+    }
+
+    .checkbox-group label {
+      color: #b0e0e6;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="loading-overlay" id="loading">
+    <div class="spinner-container">
+      <div class="spinner"></div>
+      <div class="loading-text">Analyzing device components...</div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="header">
+      <h1>🤖 AI-Powered E-Waste Estimator</h1>
+      <p>Predict recoverable materials and environmental impact from electronic devices</p>
+    </div>
+
+    <div class="content">
+      <form id="form" onsubmit="return false;">
+        <div class="form-group">
+          <label for="device_model">
+            <span class="device-icon">📱</span>
+            Device Model
+          </label>
+          <input type="text" id="device_model" name="device_model"
+            placeholder="e.g., iPhone 12, Dell Latitude 3520, Galaxy S21">
+          <small>Enter device model (optional - will auto-fill if found in database)</small>
+        </div>
+
+        <div class="form-group">
+          <label for="device_type">
+            <span class="device-icon">💻</span>
+            Device Type *
+          </label>
+          <select id="device_type" name="device_type" required>
+            <option value="">Select device type...</option>
+            <option value="smartphone">📱 Smartphone</option>
+            <option value="laptop">💻 Laptop</option>
+            <option value="tablet">📱 Tablet</option>
+            <option value="desktop">🖥️ Desktop</option>
+            <option value="monitor">🖥️ Monitor</option>
+            <option value="charger">🔌 Charger</option>
+            <option value="battery_pack">🔋 Battery Pack</option>
+            <option value="other">📦 Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="brand">
+            <span class="device-icon">🏷️</span>
+            Brand *
+          </label>
+          <input type="text" id="brand" name="brand" placeholder="e.g., Apple, Samsung, Dell" required>
+        </div>
+
+        <div class="form-group">
+          <label for="launch_year">
+            <span class="device-icon">📅</span>
+            Launch Year *
+          </label>
+          <input type="number" id="launch_year" name="launch_year" min="1990" max="2024" value="2020" required>
+        </div>
+
+        <div class="form-group">
+          <label for="age_years">
+            <span class="device-icon">⏱️</span>
+            Age (years) *
+          </label>
+          <input type="number" id="age_years" name="age_years" min="0" max="30" step="0.1" value="3" required>
+        </div>
+
+        <div class="form-group">
+          <label for="weight_g">
+            <span class="device-icon">⚖️</span>
+            Weight (grams) *
+          </label>
+          <input type="number" id="weight_g" name="weight_g" min="1" step="1" value="164" required>
+        </div>
+
+        <div class="form-group">
+          <label for="battery_type">
+            <span class="device-icon">🔋</span>
+            Battery Type *
+          </label>
+          <select id="battery_type" name="battery_type" required>
+            <option value="li-ion">🔋 Li-ion</option>
+            <option value="li-poly">🔋 Li-poly</option>
+            <option value="none">❌ None</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="condition">
+            <span class="device-icon">🔧</span>
+            Condition *
+          </label>
+          <select id="condition" name="condition" required>
+            <option value="working">✅ Working</option>
+            <option value="non-working">⚠️ Non-working</option>
+            <option value="damaged">❌ Damaged</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="screen_size_in">
+            <span class="device-icon">📺</span>
+            Screen Size (inches)
+          </label>
+          <input type="number" id="screen_size_in" name="screen_size_in" min="0" step="0.1" value="6.1">
+        </div>
+
+        <div class="form-group checkbox-group">
+          <input type="checkbox" id="is_refurbished" name="is_refurbished">
+          <label for="is_refurbished" style="margin: 0;">
+            <span class="device-icon">♻️</span>
+            Is Refurbished
+          </label>
+        </div>
+
+        <div class="form-group checkbox-group">
+          <input type="checkbox" id="has_metal_chassis" name="has_metal_chassis">
+          <label for="has_metal_chassis" style="margin: 0;">
+            <span class="device-icon">🔩</span>
+            Has Metal Chassis
+          </label>
+        </div>
+
+        <button type="button" class="btn" id="predictBtn">
+          <span>🔍 Predict Recovery</span>
+        </button>
+      </form>
+
+      <div class="error" id="error"></div>
+    </div>
+  </div>
+
+  <script>
+    async function submit() {
+      console.log('=== SUBMIT FUNCTION CALLED ===');
+      const form = document.getElementById('form');
+      const loading = document.getElementById('loading');
+      const error = document.getElementById('error');
+
+      // Hide error
+      error.classList.remove('show');
+
+      // Collect form data
+      const formData = new FormData(form);
+
+      // Validate required fields
+      const device_type = formData.get('device_type');
+      const brand = formData.get('brand');
+      const launch_year = formData.get('launch_year');
+      const age_years = formData.get('age_years');
+      const weight_g = formData.get('weight_g');
+      const battery_type = formData.get('battery_type');
+      const condition = formData.get('condition');
+
+      if (!device_type || !brand || !launch_year || !age_years || !weight_g || !battery_type || !condition) {
+        error.textContent = 'Error: Please fill in all required fields (marked with *)';
+        error.classList.add('show');
+        console.error('Missing required fields');
+        return;
+      }
+
+      const data = {
+        device_model: formData.get('device_model') || '',
+        device_type: device_type,
+        brand: brand,
+        launch_year: parseInt(launch_year),
+        age_years: parseFloat(age_years),
+        weight_g: parseFloat(weight_g),
+        battery_type: battery_type,
+        condition: condition,
+        is_refurbished: formData.get('is_refurbished') === 'on',
+        has_metal_chassis: formData.get('has_metal_chassis') === 'on',
+        screen_size_in: parseFloat(formData.get('screen_size_in')) || 0.0
+      };
+
+      console.log('Collected form data:', data);
+
+      try {
+        // Show loading
+        loading.classList.add('show');
+
+        console.log('Sending request with data:', data);
+        const res = await fetch('/predict', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        console.log('Response status:', res.status);
+
+        if (!res.ok) {
+          const errorText = await res.text();
+          console.error('Error response:', errorText);
+          throw new Error(`Server error: ${res.status} - ${errorText}`);
+        }
+
+        const json = await res.json();
+        console.log('Received response:', json);
+
+        if (json.error) {
+          throw new Error(json.error);
+        }
+
+        if (!json.prediction) {
+          throw new Error('No prediction in response');
+        }
+
+        // Store data in localStorage and redirect to results page
+        const resultData = {
+          input: json.input,
+          prediction: json.prediction
+        };
+
+        // Store in localStorage (more reliable than URL params)
+        localStorage.setItem('predictionData', JSON.stringify(resultData));
+        // Use absolute path to ensure it works
+        window.location.href = '/results.html';
+
+      } catch (err) {
+        loading.classList.remove('show');
+        console.error('=== ERROR CAUGHT ===');
+        console.error('Error type:', err.constructor.name);
+        console.error('Error message:', err.message);
+        console.error('Error stack:', err.stack);
+
+        const errorMsg = err.message || 'Unknown error occurred';
+        error.textContent = 'Error: ' + errorMsg;
+        error.classList.add('show');
+      }
+    }
+
+    // Prevent form submission and attach button click handler
+    document.getElementById('form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    });
+
+    // Attach click handler to predict button
+    document.getElementById('predictBtn').addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log('Predict button clicked!');
+      submit();
+      return false;
+    });
+
+    // Log when page loads
+    console.log('Page loaded. Form ready for input.');
+  </script>
+</body>
+
+</html>
