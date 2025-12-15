@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 import os
 from pathlib import Path
-from device_database import lookup_device
+from .device_database import lookup_device
 
 # Get the base directory (parent of src)
 BASE_DIR = Path(__file__).parent.parent
