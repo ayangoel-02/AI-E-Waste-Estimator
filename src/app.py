@@ -13,7 +13,12 @@ from device_database import lookup_device
 # Get the base directory (parent of src)
 BASE_DIR = Path(__file__).parent.parent
 
-app = FastAPI(title="AI-Powered E-Waste Material Recovery Estimator")
+# app = FastAPI(title="AI-Powered E-Waste Material Recovery Estimator")
+app = FastAPI(
+    title="AI-Powered E-Waste Recovery Estimator",
+    root_path="/api"
+)
+
 
 # Load model
 model_path = BASE_DIR / "models" / "ewaste_estimator.pkl"
