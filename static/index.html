@@ -589,7 +589,7 @@
         loading.classList.add('show');
 
         console.log('Sending request with data:', data);
-        const res = await fetch('/predict', {
+        const res = await fetch('/api/predict', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)
