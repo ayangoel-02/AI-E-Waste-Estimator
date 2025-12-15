@@ -1,12 +1,2 @@
-# IMPORTANT: API redirect FIRST
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/api/:splat"
-  status = 200
-  force = true
-
-# Frontend fallback LAST
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+/api/*  /.netlify/functions/api/:splat  200
+/*      /index.html                     200
