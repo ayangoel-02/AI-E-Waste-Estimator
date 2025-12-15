@@ -7,14 +7,13 @@
   PYTHON_VERSION = "3.11.5"
 
 # IMPORTANT: API redirect FIRST
-# [[redirects]]
-#   from = "/api/*"
-#   to = "/.netlify/functions/api/:splat"
-#   status = 200
-#   force = true
-
-# # Frontend fallback LAST
-# [[redirects]]
-#   from = "/*"
-#   to = "/index.html"
-#   status = 200
+ [[redirects]]
+   from = "/api/*"
+   to = "/.netlify/functions/api/:splat"
+   status = 200
+   force = true
+ # Frontend fallback LAST
+ [[redirects]]
+   from = "/*"
+   to = "/index.html"
+   status = 200
